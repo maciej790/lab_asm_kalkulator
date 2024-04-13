@@ -1,0 +1,15 @@
+SYS_EXIT  equ 1 ; Exit syscall number
+SYS_WRITE equ 4 ; Write syscall number
+STDOUT    equ 1 ; Standard output file descriptor
+
+section .data
+    liczba1 db 0x123a
+    liczba2 db 0x123b
+section .bss
+    wynik resb 5
+
+section .text
+global _start
+
+_start:
+    mov eax, '+'

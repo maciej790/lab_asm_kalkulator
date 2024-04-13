@@ -1,0 +1,48 @@
+SYS_EXIT  equ 1 ; Exit syscall number
+SYS_WRITE equ 4 ; Write syscall number
+STDOUT    equ 1 ; Standard output file descriptor
+
+section .data
+    liczba1 db 0x123a
+    liczba2 db 0x123b
+section .bss
+    wynik resb 5
+
+section .text
+global _start
+
+_start:
+    mov esi, 4          ; Loop counter
+    xor edx, edx        ; Clear the carry flag
+dodawanie:
+    mov eax, [liczba1 + esi - 1]  ; Load digit from liczba1
+    mov ebx, [liczba2 + esi - 1]  ; Load digit from liczba2
+    sub eax, '0'                  ; Convert ASCII to numeric value
+    sub ebx, '0'                  ; Convert ASCII to numeric value
+    add eax, ebx                  ; Add digits
+    
+    adc al, dl                    ; Add the carry flag (dl) to the least significant digit (al)
+    mov dl, 0                     ; Clear the carry flag for the next iteration
+
+    cmp al, 9                     ; Check if the result is greater than 9
+    jbe zapisz                    ; If not, store the result
+    sub al, 10                    ; Adjust the result by adding 10
+    mov dl, 1                     ; Set the carry flag for the next iteration
+
+zapisz:
+    add eax, '0'                  ; Convert numeric value to ASCII
+    mov [wynik + esi - 1], al     ; Store the least significant digit of the result
+    dec esi                        ; Decrement the counter
+    jnz dodawanie                 ; Repeat if not yet done
+
+    ; Write the result
+    mov eax, SYS_WRITE
+    mov ebx, STDOUT
+    mov ecx, wynik
+    mov edx, 4
+    int 0x80
+
+    ; Exit the program
+    mov eax, SYS_EXIT
+    xor ebx, ebx
+    int 0x80
