@@ -223,7 +223,7 @@ dzielenie_zapisz_wynik:
     ; Wyświetlenie wyniku
     mov al, [wynik]
     add al, '0'
-    add al, 7h ; Dodaj 7h, aby przekształcić cyfrę w systemie szesnastkowym
+    add al, 7h ; 7h aby przekształcić cyfrę w systemie szesnastkowym
     mov edx, 101
     mov ecx, wynik
     mov ebx, STDOUT   
