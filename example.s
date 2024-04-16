@@ -1,10 +1,3 @@
-;nauczyc sie kodu dzielenie
-;pomeczyc moze jeszcze troche to dzielenie - hex
-;zrobic sprawko z dzielenia
-;zlepic calosc
-;nauczuc sie calosci
-;kod cpp (przerobic) + lista krokow
-
 SYS_EXIT  equ 1
 SYS_READ  equ 3 ;czytaj
 SYS_WRITE equ 4 ; zapisz
@@ -38,72 +31,67 @@ _start:
     mov edi, liczba2  
     mov ecx, 100
 
-;funkcje
 funkcja_dzielenie:
-    ; Inicjalizacja licznika
     xor ecx, ecx
     
-    ; Przygotowanie do pętli dzielenia
-    mov esi, liczba1 ; Pierwsza liczba
-    mov edi, liczba2 ; Druga liczba
+    mov esi, liczba1 
+    mov edi, liczba2 
 
     sub esi, '0'
     sub edi, '0'
 
-    ; Inicjalizacja wyniku
+    ; najnstarszy bit wyniku przesun na zero
     mov ebx, wynik
-    mov byte [ebx], '0' ; Ustaw pierwszą cyfrę wyniku na zero
-    inc ebx
+    mov byte [ebx], '0' 
+    inc ebx ;inkrementacja miejsca w wyniku
 
 dzielenie_nastepna_cyfra:
-    ; Przygotowanie do sprawdzenia, czy kolejna cyfra może być dodana do wyniku
-    mov eax, dword [esi + ecx] ; Wczytaj kolejne 4 bajty z pierwszej liczby
+    ; czy mozna dodac kolejna cyfre do wyniku
+    mov eax, dword [esi + ecx] ; wczytaj kolejne 4 bity z pierwszej liczby
 
-    ; Sprawdź, czy jest możliwe dodanie kolejnej cyfry do wyniku
+    ;czy mozna dodac koljna cyfre do wyniku
     cmp eax, 0
-    je dzielenie_wynik
+    je dzielenie_zapisz_wynik
 
-    ; Dodaj kolejną cyfrę do wyniku
+    ; dodaj kolejną cyfrę do wyniku
     add ebx, ecx
     mov dword [ebx], eax
 
-    ; Przygotowanie do przesunięcia reszty
+    ; przygotowanie do przesuniecia reszty
     mov edx, 0
 
-dzielenie_podzial:
-    ; Sprawdź, czy reszta jest większa lub równa drugiej liczbie
+dzielenie_reszta:
+    ;czy reszta >= liczba2
     cmp edx, dword [edi]
-    jb dzielenie_podzial_koniec
+    jb dzielenie_reszta_koniec
 
-    ; Oblicz nową cyfrę wyniku i resztę
+    ;nowa cyfra wyniku i reszta
     inc byte [ebx]
     sub edx, dword [edi]
 
-    ; Powtórz, dopóki reszta jest większa lub równa drugiej liczbie
-    jmp dzielenie_podzial
+    ; dopoki reszta >= liczba2
+    jmp dzielenie_reszta
 
-dzielenie_podzial_koniec:
-    ; Przygotuj się do kolejnej iteracji
-    add ecx, 4 ; Przesunięcie do kolejnej cyfry
-    inc ebx ; Przesunięcie do kolejnej cyfry wyniku
-    xor edx, edx ; Wyzeruj resztę
+dzielenie_reszta_koniec:
+    ; kolejna iteracja
+    add ecx, 4 ;przesuwun 4 w prawo (bajt)
+    inc ebx ; przesunięcie do kolejnej cyfry wyniku
+    xor edx, edx ; wyzeruj resztę
 
-    ; Przygotowanie do sprawdzenia, czy jest możliwe dodanie kolejnej cyfry do wyniku
-    cmp ecx, 100 ; Zakładając, że liczba1 ma maksymalnie 100 cyfr
+    ; czy mozna dodac koljna cyfre do wyniku
+    cmp ecx, 100
     jl dzielenie_nastepna_cyfra
 
-dzielenie_wynik:
+dzielenie_zapisz_wynik:
     ; Wyświetlenie wyniku
     mov al, [wynik]
     add al, '0'
     add al, 7h ; Dodaj 7h, aby przekształcić cyfrę w systemie szesnastkowym
-    mov edx, 101 ; Liczba cyfr do wyświetlenia
-    sub edx, wynik ; Odejmij wskaźnik początkowy od końcowego, aby uzyskać długość
+    mov edx, 101
     mov ecx, wynik
     mov ebx, STDOUT   
     mov eax, SYS_WRITE 
     int 0x80     
 
-    ; Wyjście
     mov eax, SYS_EXIT  
     int 0x80
